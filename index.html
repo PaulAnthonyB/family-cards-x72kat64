@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Same Team">
+<meta name="theme-color" content="#1c1714">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231c1714'/%3E%3Ctext x='90' y='118' font-family='Georgia,serif' font-size='90' fill='%23e6c9a0' text-anchor='middle' font-style='italic'%3Est%3C/text%3E%3C/svg%3E">
+<title>Same Team</title>
+<style>
+  :root {
+    --bg: #1c1714;
+    --bg-elev: #25201c;
+    --bg-elev-2: #2d2722;
+    --ink: #e8dccb;
+    --ink-soft: #b8a892;
+    --ink-faint: #7a6f63;
+    --accent: #e6b478;
+    --accent-soft: #c89464;
+    --warn: #d48a6a;
+    --danger: #c76d5a;
+    --good: #9bb88a;
+    --rule: #3a322c;
+    --safe-top: env(safe-area-inset-top, 0);
+    --safe-bot: env(safe-area-inset-bottom, 0);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Georgia, 'Iowan Old Style', 'Palatino', serif;
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+  body { min-height: 100vh; }
+
+  /* ---------- layout shell ---------- */
+  .app {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: calc(var(--safe-top) + 18px) 20px calc(var(--safe-bot) + 28px);
+    min-height: 100vh;
+  }
+
+  /* ---------- header ---------- */
+  header.home-header {
+    text-align: center;
+    padding: 8px 0 24px;
+  }
+  header.home-header .eyebrow {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  header.home-header h1 {
+    font-size: 28px;
+    font-weight: normal;
+    font-style: italic;
+    color: var(--accent);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  header.home-header .subtitle {
+    color: var(--ink-soft);
+    font-size: 14px;
+    font-style: italic;
+    margin-top: 8px;
+  }
+
+  /* ---------- panic button ---------- */
+  .panic {
+    display: block;
+    width: 100%;
+    background: linear-gradient(135deg, #3a2820, #4a3128);
+    border: 1px solid var(--accent-soft);
+    color: var(--accent);
+    padding: 18px 20px;
+    border-radius: 14px;
+    font-family: inherit;
+    font-size: 17px;
+    text-align: left;
+    cursor: pointer;
+    margin-bottom: 24px;
+    transition: transform 0.1s ease;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .panic:active { transform: scale(0.98); }
+  .panic .panic-label {
+    font-family: -apple-system, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+    margin-bottom: 4px;
+  }
+  .panic .panic-text {
+    font-style: italic;
+    font-size: 18px;
+  }
+
+  /* ---------- card grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .card-btn {
+    display: block;
+    width: 100%;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 16px 18px;
+    border-radius: 12px;
+    text-align: left;
+    font-family: inherit;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .card-btn:active { transform: scale(0.985); background: var(--bg-elev-2); }
+  .card-btn .num {
+    font-family: -apple-system, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
+  }
+  .card-btn .title {
+    color: var(--accent);
+    font-style: italic;
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+  .card-btn .when {
+    color: var(--ink-soft);
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  /* ---------- footer ---------- */
+  .home-footer {
+    text-align: center;
+    margin-top: 32px;
+    color: var(--ink-faint);
+    font-size: 12px;
+    font-style: italic;
+  }
+
+  /* ---------- card view ---------- */
+  .card-view { display: none; }
+  .card-view.active { display: block; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-family: inherit;
+    font-size: 16px;
+    font-style: italic;
+    padding: 8px 0;
+    margin-bottom: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-btn:active { color: var(--accent-soft); }
+
+  .card-view h2 {
+    font-size: 24px;
+    font-weight: normal;
+    color: var(--accent);
+    margin: 0 0 4px;
+    font-style: italic;
+    letter-spacing: -0.01em;
+  }
+  .card-view .location {
+    font-family: -apple-system, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 18px;
+  }
+
+  .card-view h3 {
+    font-size: 17px;
+    font-weight: normal;
+    color: var(--accent);
+    font-style: italic;
+    margin: 22px 0 8px;
+  }
+
+  .card-view p { margin: 0 0 12px; color: var(--ink); }
+  .card-view p.note {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 15px;
+  }
+  .card-view ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px;
+  }
+  .card-view li {
+    padding: 6px 0 6px 18px;
+    position: relative;
+    color: var(--ink);
+  }
+  .card-view li::before {
+    content: '·';
+    position: absolute;
+    left: 4px;
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 1.2;
+  }
+  .card-view strong { color: var(--accent); font-weight: normal; font-style: italic; }
+  .card-view em { color: var(--ink-soft); }
+  .card-view .quote {
+    border-left: 2px solid var(--accent-soft);
+    padding: 6px 0 6px 14px;
+    margin: 12px 0;
+    color: var(--accent);
+    font-style: italic;
+  }
+  .card-view .callout {
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 14px 0;
+  }
+  .card-view .callout.warm {
+    background: linear-gradient(135deg, #2a2018, #312419);
+    border-color: var(--accent-soft);
+  }
+  .card-view .number-list {
+    counter-reset: step;
+    padding: 0;
+  }
+  .card-view .number-list li {
+    padding-left: 28px;
+    counter-increment: step;
+  }
+  .card-view .number-list li::before {
+    content: counter(step);
+    font-family: -apple-system, sans-serif;
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid var(--accent-soft);
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: 0;
+    top: 9px;
+    line-height: 1;
+  }
+  .card-view hr {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 20px 0;
+  }
+  .card-view .phone {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent-soft);
+  }
+
+  /* ---------- check-in ---------- */
+  .checkin-form {
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .checkin-form .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .checkin-form .row:last-of-type { border-bottom: none; }
+  .checkin-form label {
+    flex: 1;
+    color: var(--ink);
+    font-size: 15px;
+  }
+  .checkin-form .label-sub {
+    display: block;
+    color: var(--ink-faint);
+    font-size: 12px;
+    font-style: italic;
+    margin-top: 2px;
+  }
+  .yn-toggle {
+    display: flex;
+    gap: 6px;
+  }
+  .yn-toggle button {
+    background: var(--bg-elev-2);
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 56px;
+  }
+  .yn-toggle button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #1c1714;
+  }
+  .score-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .score-row button {
+    flex: 1;
+    min-width: 32px;
+    background: var(--bg-elev-2);
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 10px 4px;
+    border-radius: 6px;
+    font-family: -apple-system, sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .score-row button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #1c1714;
+  }
+  .score-row button.active.low { background: var(--warn); border-color: var(--warn); }
+  .who-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .who-toggle button {
+    flex: 1;
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 10px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .who-toggle button.active {
+    background: var(--accent-soft);
+    border-color: var(--accent-soft);
+    color: #1c1714;
+    font-style: italic;
+  }
+  .save-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    color: #1c1714;
+    padding: 14px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 16px;
+    font-style: italic;
+    cursor: pointer;
+    margin-top: 14px;
+  }
+  .save-btn:disabled { opacity: 0.4; }
+  .save-btn:active:not(:disabled) { background: var(--accent-soft); }
+
+  .log {
+    margin-top: 20px;
+  }
+  .log h3 { margin-top: 0; }
+  .log-entry {
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .log-entry .date {
+    color: var(--ink-soft);
+    font-family: -apple-system, sans-serif;
+    font-size: 13px;
+  }
+  .log-entry .summary {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .log-entry .score {
+    font-style: italic;
+    font-size: 18px;
+    color: var(--accent);
+  }
+  .log-entry .score.low { color: var(--warn); }
+  .log-entry .flags {
+    color: var(--ink-faint);
+    font-size: 12px;
+  }
+  .alert {
+    background: linear-gradient(135deg, #3a2218, #4a2820);
+    border: 1px solid var(--warn);
+    color: var(--warn);
+    border-radius: 10px;
+    padding: 14px;
+    margin: 14px 0;
+    font-style: italic;
+    font-size: 14px;
+  }
+  .empty {
+    color: var(--ink-faint);
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+  }
+  .delete-link {
+    background: none;
+    border: none;
+    color: var(--ink-faint);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ HOME ============ -->
+  <div id="home" class="card-view active">
+    <header class="home-header">
+      <div class="eyebrow">For us</div>
+      <h1>Same Team</h1>
+      <div class="subtitle">Past-us, looking after present-us.</div>
+    </header>
+
+    <button class="panic" onclick="show('card2')">
+      <div class="panic-label">Right now</div>
+      <div class="panic-text">We're both drowning</div>
+    </button>
+
+    <div class="grid">
+      <button class="card-btn" onclick="show('card1')">
+        <div class="num">Card 1</div>
+        <div class="title">Core principles</div>
+        <div class="when">The operating system</div>
+      </button>
+      <button class="card-btn" onclick="show('card3')">
+        <div class="num">Card 3</div>
+        <div class="title">Mum — early warning</div>
+        <div class="when">When she seems off, or you're not sure</div>
+      </button>
+      <button class="card-btn" onclick="show('card6')">
+        <div class="num">Card 6</div>
+        <div class="title">Dad — early warning</div>
+        <div class="when">When Dad is sliding</div>
+      </button>
+      <button class="card-btn" onclick="show('card5')">
+        <div class="num">Card 5</div>
+        <div class="title">The toddler</div>
+        <div class="when">When the regression hits</div>
+      </button>
+      <button class="card-btn" onclick="show('card4')">
+        <div class="num">Card 4</div>
+        <div class="title">The next 72 hours</div>
+        <div class="when">Read in week one</div>
+      </button>
+      <button class="card-btn" onclick="show('checkin')">
+        <div class="num">Card 7</div>
+        <div class="title">Daily check-in</div>
+        <div class="when">Every evening, 30 seconds</div>
+      </button>
+    </div>
+
+    <div class="home-footer">
+      We've got this. We already know more than we did last time.
+    </div>
+  </div>
+
+  <!-- ============ CARD 1 ============ -->
+  <div id="card1" class="card-view">
+    <button class="back-btn" onclick="show('home')">← back</button>
+    <h2>Core principles</h2>
+    <div class="location">Card 1 · The operating system</div>
+
+    <h3>Don't ask. Observe and act.</h3>
+    <p>"Tell me what you need" is another task on her pile. Hand her the plate. Take the baby. Start the shower. <strong>If you'd have to ask her to ask — just do it.</strong></p>
+
+    <h3>Mum's care = the whole family's care</h3>
+    <p>Her sleep, recovery, and mental health are the load-bearing wall. Protecting them is <strong>strategy</strong>, not selfishness.</p>
+
+    <h3>Oxygen mask first</h3>
+    <ul>
+      <li><strong>Mum:</strong> one solid sleep chunk per night. Physio. Outside. Breaks. Non-negotiable.</li>
+      <li><strong>Dad:</strong> one solid sleep chunk per night. 30 min movement every 1–2 days.</li>
+    </ul>
+
+    <h3>Don't go down with the ship</h3>
+    <p><em>If</em> it's a one-person job → <em>then</em> the other parent sleeps. No guilt. No "keeping company."</p>
+
+    <h3>Protect earplug time</h3>
+    <p>Off-duty parent is <strong>fully</strong> off. On-duty handles everything short of emergency.</p>
+
+    <h3>Circuit breaker: "Same team"</h3>
+    <p>Either of us can say it, any time. Response = hand squeeze, not words. Stop. Reset. We're not opponents.</p>
+
+    <h3>The relationship is the foundation</h3>
+    <p>None of this — the new family of four — works without us. The Mum/Dad relationship is the ground everything else stands on. <strong>Nurture and protect it.</strong> A 5-minute "us" check-in daily (not logistics, not the kids — <em>us</em>). A hand on the back while brushing teeth. Eye contact across the room. Small, often, deliberate.</p>
+
+    <h3>Imperfect &gt; pleasing</h3>
+    <ul>
+      <li><strong>Stop people-pleasing.</strong> We don't owe anyone a "yes" right now. Energy is finite; spend it on us four.</li>
+      <li><strong>Stop perfecting.</strong> Getting it wrong and adjusting <em>is</em> the path. Mitigating every failure mode in advance is its own failure mode.</li>
+      <li><strong>It's okay to ask. It's okay to hear no. It's okay to say no.</strong> Three separate permissions. All true.</li>
+    </ul>
+  </div>
+
+  <!-- ============ CARD 2 ============ -->
+  <div id="card2" class="card-view">
+    <button class="back-btn" onclick="show('home')">← back</button>
+    <h2>The drowning spiral</h2>
+    <div class="location">Card 2 · Right now</div>
+
+    <div class="callout warm">
+      <p style="margin:0;"><em>If</em> we're both exhausted, both drowning, both guilty about self-care → <em>then</em> this is a predictable pattern, not a relationship problem.</p>
+    </div>
+
+    <h3>What's happening</h3>
+    <p>Running on empty makes self-care look like theft from the other. Guilt refuses rest. Refusing rest deepens the deficit. Depletion <em>looks</em> like resentment but is fuel starvation.</p>
+    <p><strong>The resentment is a symptom — not evidence about your partner.</strong></p>
+
+    <h3>The move</h3>
+    <p>One of us sleeps <strong>now</strong>. Coin flip if needed. The non-sleeper doesn't earn anything by suffering through. We will swap.</p>
+
+    <h3>The script</h3>
+    <div class="quote">"We're both depleted. That's the problem. Who sleeps first?"</div>
+  </div>
+
+  <!-- ============ CARD 3 ============ -->
+  <div id="card3" class="card-view">
+    <button class="back-btn" onclick="show('home')">← back</button>
+    <h2>Mum — early warning</h2>
+    <div class="location">Card 3 · The most important card</div>
+
+    <p class="note">Last time, this is where it broke. Catching the slide at week 2 is 10× easier than climbing out at week 6.</p>
+
+    <h3>Daily check-in (Dad asks, every evening)</h3>
+    <ul>
+      <li>Sleep chunk?</li>
+      <li>Outside today?</li>
+      <li>Out of 10?</li>
+    </ul>
+    <p>A number is easier than a sentence when she's depleted. <strong>Three days under 5 = act, don't wait.</strong></p>
+
+    <h3>Don't wait for her to ask</h3>
+    <p>She can't. Noticing → naming → asking is three tasks she doesn't have the bandwidth for. <strong>Observe and act.</strong></p>
+
+    <h3>Her specific tells</h3>
+    <ul>
+      <li><strong>Physical/emotional disengagement.</strong> Not wanting to be hugged or touched. She is normally very affectionate — withdrawal from touch is a strong, reliable tell.</li>
+      <li><strong>Over-apologising.</strong> Apologies for things that don't warrant them.</li>
+      <li><strong>Slow response, or unresponsive.</strong> Going quiet, going internal, going flat.</li>
+      <li><strong>Overwhelmed by tiny things.</strong> A small task or ask producing a disproportionate reaction.</li>
+    </ul>
+
+    <h3>Red flags — call today</h3>
+    <ul>
+      <li>Thoughts of harm to self or baby</li>
+      <li>Feeling disconnected from baby ("this doesn't feel like my baby")</li>
+      <li>Cannot sleep 48+ hrs even with opportunity</li>
+      <li>Hopelessness that doesn't lift</li>
+    </ul>
+
+    <h3>Action ladder</h3>
+    <ul class="number-list">
+      <li>Extra sleep chunk + outside + a meal she didn't cook (24–48 hrs)</li>
+      <li>Call in help for a half-day off</li>
+      <li>GP appointment. <strong>PANDA: <a href="tel:1300726306" class="phone">1300 726 306</a></strong></li>
+      <li><strong>Maternal &amp; Child Health 24/7: <a href="tel:132229" class="phone">13 22 29</a></strong></li>
+    </ul>
+
+    <h3>Dad's job</h3>
+    <p>Mum will minimise. PND lies to the person who has it. <strong>Trust the pattern, not her in-the-moment assessment.</strong> Three tells + "I'm fine" = book the GP. She agreed to this when she was clear-eyed. Honour past-her.</p>
+
+    <div class="quote">"If we see the tells, we act without asking permission, because past-us decided present-us couldn't be trusted to."</div>
+  </div>
+
+  <!-- ============ CARD 4 ============ -->
+  <div id="card4" class="card-view">
+    <button class="back-btn" onclick="show('home')">← back</button>
+    <h2>The next 72 hours</h2>
+    <div class="location">Card 4 · Read in week one</div>
+
+    <p>The cesarean meds are wearing off over the next 1–3 days. Expect a <strong>pain step-up</strong>, and a <strong>mood dip around days 3–5</strong> ("baby blues" — milk coming in, hormones crashing).</p>
+
+    <div class="callout warm">
+      <p style="margin:0;"><strong>This is biology, not a sign things are going wrong.</strong> Naming it now means recognising it then.</p>
+    </div>
+
+    <h3>Specifically watch for</h3>
+    <ul>
+      <li>Mum trying to do too much as pain ramps up (she'll underestimate it because right now feels manageable)</li>
+      <li>Day 3–5 tearfulness — normal, but check it doesn't <em>stay</em> past day 10–14</li>
+      <li>You crashing at 48–72 hrs once adrenaline fades — your turn for a sleep chunk is coming. Claim it.</li>
+    </ul>
+
+    <h3>Two things to do this week</h3>
+    <ul>
+      <li><strong>Book Mum's 6-week GP check-in now.</strong> Default = appointment exists. Cancel if not needed.</li>
+      <li><strong>Brief one outside person</strong> (a parent, a close friend) — their job is to ask Mum honestly at weeks 2, 4, 6 and push past "I'm good!"</li>
+    </ul>
+  </div>
+
+  <!-- ============ CARD 5 ============ -->
+  <div id="card5" class="card-view">
+    <button class="back-btn" onclick="show('home')">← back</button>
+    <h2>The toddler</h2>
+    <div class="location">Card 5 · When the regression hits</div>
+
+    <p class="note">Bub #2 changes bub #1's world more than it changes yours. Their regression is grief, not behaviour. Discipline misses the point; connection is the move.</p>
+
+    <h3>Expect, and don't be alarmed by</h3>
+    <ul>
+      <li>Sleep regression, new clinginess, separation anxiety</li>
+      <li>Hitting, biting, lashing out (sometimes at the baby)</li>
+      <li>Toilet-training backslide</li>
+      <li>Food refusal, meltdowns over nothing</li>
+      <li>"Baby talk," wanting to be carried, regressing to younger behaviours</li>
+    </ul>
+
+    <div class="callout">
+      <p style="margin:0;"><strong>This is grief and demotion, not naughtiness.</strong> Their entire social order just changed. Meet it with connection, not consequences.</p>
+    </div>
+
+    <h3>The non-negotiables</h3>
+    <ul>
+      <li><strong>15 minutes of 1:1 "special time" daily.</strong> Phone down. Baby elsewhere. Toddler picks the activity.</li>
+      <li><strong>Don't blame the baby out loud.</strong> Not "I can't, I'm feeding the baby" → instead "I'll be there in 2 minutes."</li>
+      <li><strong>Let them "help."</strong> Fetch the nappy. Sing to bub. Choose the onesie. Inclusion beats exclusion.</li>
+      <li><strong>Pre-warn transitions.</strong> "After this story, it's bath." Their world is unpredictable right now — narration is medicine.</li>
+      <li><strong>Protect the routine.</strong> Daycare days, nap times, bedtime. Known-good anchors in an unknown week.</li>
+      <li><strong>Tag-team bedtime.</strong> Whoever has more in the tank does it tonight. Don't default it to one person.</li>
+    </ul>
+
+    <h3>When they lash out at the baby</h3>
+    <p>Calm, not angry. Move bub to safety, then get low and connect with the toddler. <em>"You're having big feelings. The baby is little and we keep her safe. Come here."</em> The behaviour is a flare, not a fight.</p>
+
+    <h3>Watch for</h3>
+    <p>The toddler going <em>too</em> quiet, <em>too</em> compliant. Big kids who suddenly stop demanding attention are sometimes the ones who need it most.</p>
+  </div>
+
+  <!-- ============ CARD 6 ============ -->
+  <div id="card6" class="card-view">
+    <button class="back-btn" onclick="show('home')">← back</button>
+    <h2>Dad — early warning</h2>
+    <div class="location">Card 6 · When Dad is sliding</div>
+
+    <p class="note">Paternal PND is real and under-diagnosed. Dad runs the early-warning system for Mum; this card runs it for him. Catching it early matters for the same reasons.</p>
+
+    <h3>Dad's specific tells</h3>
+    <ul>
+      <li><strong>Arms folded low across the belly, thumbs massaging the inner elbows.</strong> His body's "I'm exposed" signal. It surfaces under guilt and self-loathing before he's consciously aware of it.</li>
+      <li><strong>Slow to respond, or not responding at all.</strong> Going quiet, going internal, going flat.</li>
+      <li><strong>Apologising profusely</strong> — apologies for things that don't warrant them, or stacked apologies for the same thing.</li>
+      <li><strong>Self-punishment / self-harm urges.</strong> Punishing self-talk, refusing rest or food as penance, any urge toward physical self-harm. <strong>This is a red flag on its own — straight to step 1.</strong></li>
+    </ul>
+
+    <h3>For Mum</h3>
+    <div class="callout">
+      <p style="margin:0;">Read this if you want, but not as a job. If you happen to notice the tells, it's useful information — but <strong>this is not your job.</strong> Your only assignment is your own oxygen mask. If you spot it and have capacity, a hand on the back and <em>"same team"</em> is enough. Dad is responsible for noticing himself.</p>
+    </div>
+
+    <h3>Action ladder</h3>
+    <ul class="number-list">
+      <li>Name it out loud to Mum (the hardest step and the most important one)</li>
+      <li>Sleep chunk + outside + movement, within 24 hrs</li>
+      <li>Talk to a mate — a real one, not a surface one</li>
+      <li>GP. <strong>Beyond Blue: <a href="tel:1300224636" class="phone">1300 22 4636</a></strong>. <strong>MensLine: <a href="tel:1300789978" class="phone">1300 78 99 78</a></strong></li>
+      <li>If self-harm urges aren't shifting: <strong>Lifeline <a href="tel:131114" class="phone">13 11 14</a></strong>, or present to ED.</li>
+    </ul>
+
+    <div class="quote">"If Dad catches himself three times in a day, or Mum points it out, or any self-punishment urge surfaces — he names it out loud and starts the ladder. No 'I'm fine.' No 'I just need to push through.'"</div>
+  </div>
+
+  <!-- ============ CHECK-IN ============ -->
+  <div id="checkin" class="card-view">
+    <button class="back-btn" onclick="show('home')">← back</button>
+    <h2>Daily check-in</h2>
+    <div class="location">Card 7 · 30 seconds, every evening</div>
+
+    <div class="who-toggle">
+      <button id="who-mum" class="active" onclick="setWho('mum')">Mum</button>
+      <button id="who-dad" onclick="setWho('dad')">Dad</button>
+    </div>
+
+    <div class="checkin-form">
+      <div class="row">
+        <label>
+          Sleep chunk today?
+          <span class="label-sub">One solid stretch, undisturbed</span>
+        </label>
+        <div class="yn-toggle" id="sleep-toggle">
+          <button data-val="yes" onclick="setYN('sleep','yes')">Yes</button>
+          <button data-val="no" onclick="setYN('sleep','no')">No</button>
+        </div>
+      </div>
+      <div class="row">
+        <label>
+          Outside today?
+          <span class="label-sub">Even 5 minutes counts</span>
+        </label>
+        <div class="yn-toggle" id="outside-toggle">
+          <button data-val="yes" onclick="setYN('outside','yes')">Yes</button>
+          <button data-val="no" onclick="setYN('outside','no')">No</button>
+        </div>
+      </div>
+      <div style="padding-top:10px;">
+        <label>Out of 10, how are you?</label>
+        <div class="score-row" id="score-row">
+          <button onclick="setScore(1)">1</button>
+          <button onclick="setScore(2)">2</button>
+          <button onclick="setScore(3)">3</button>
+          <button onclick="setScore(4)">4</button>
+          <button onclick="setScore(5)">5</button>
+          <button onclick="setScore(6)">6</button>
+          <button onclick="setScore(7)">7</button>
+          <button onclick="setScore(8)">8</button>
+          <button onclick="setScore(9)">9</button>
+          <button onclick="setScore(10)">10</button>
+        </div>
+      </div>
+      <button class="save-btn" id="save-btn" onclick="saveEntry()" disabled>Save tonight's check-in</button>
+    </div>
+
+    <div id="alert-area"></div>
+
+    <div class="log">
+      <h3>Last 7 days</h3>
+      <div id="log-entries"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ---------- nav ----------
+  function show(id) {
+    document.querySelectorAll('.card-view').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+    if (id === 'checkin') renderLog();
+  }
+
+  // ---------- check-in state ----------
+  let currentWho = 'mum';
+  let formState = { sleep: null, outside: null, score: null };
+
+  function setWho(who) {
+    currentWho = who;
+    document.getElementById('who-mum').classList.toggle('active', who === 'mum');
+    document.getElementById('who-dad').classList.toggle('active', who === 'dad');
+    resetForm();
+    renderLog();
+  }
+
+  function setYN(field, val) {
+    formState[field] = val;
+    const toggle = document.getElementById(field + '-toggle');
+    toggle.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.dataset.val === val);
+    });
+    updateSaveBtn();
+  }
+
+  function setScore(n) {
+    formState.score = n;
+    const row = document.getElementById('score-row');
+    row.querySelectorAll('button').forEach((b, i) => {
+      b.classList.toggle('active', i + 1 === n);
+      b.classList.toggle('low', n < 5);
+    });
+    updateSaveBtn();
+  }
+
+  function updateSaveBtn() {
+    const ready = formState.sleep && formState.outside && formState.score !== null;
+    document.getElementById('save-btn').disabled = !ready;
+  }
+
+  function resetForm() {
+    formState = { sleep: null, outside: null, score: null };
+    document.querySelectorAll('#sleep-toggle button, #outside-toggle button, #score-row button')
+      .forEach(b => { b.classList.remove('active'); b.classList.remove('low'); });
+    document.getElementById('save-btn').disabled = true;
+  }
+
+  // ---------- storage ----------
+  function loadLog() {
+    try {
+      const raw = localStorage.getItem('checkins');
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  }
+  function saveLog(log) {
+    localStorage.setItem('checkins', JSON.stringify(log));
+  }
+
+  function todayKey() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function saveEntry() {
+    const log = loadLog();
+    const today = todayKey();
+    // remove any existing entry for today + this person
+    const filtered = log.filter(e => !(e.date === today && e.who === currentWho));
+    filtered.push({
+      date: today,
+      who: currentWho,
+      sleep: formState.sleep,
+      outside: formState.outside,
+      score: formState.score,
+      ts: Date.now()
+    });
+    saveLog(filtered);
+    resetForm();
+    renderLog();
+  }
+
+  function deleteEntry(date, who) {
+    const log = loadLog().filter(e => !(e.date === date && e.who === who));
+    saveLog(log);
+    renderLog();
+  }
+
+  function renderLog() {
+    const log = loadLog();
+    const entries = log
+      .filter(e => e.who === currentWho)
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 7);
+
+    const container = document.getElementById('log-entries');
+    if (entries.length === 0) {
+      container.innerHTML = '<div class="empty">No check-ins yet for ' + (currentWho === 'mum' ? 'Mum' : 'Dad') + '.</div>';
+    } else {
+      container.innerHTML = entries.map(e => {
+        const dt = new Date(e.date + 'T00:00:00');
+        const dateStr = dt.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+        const flags = [];
+        if (e.sleep === 'no') flags.push('no sleep');
+        if (e.outside === 'no') flags.push('no outside');
+        return `
+          <div class="log-entry">
+            <div>
+              <div class="date">${dateStr}</div>
+              ${flags.length ? `<div class="flags">${flags.join(' · ')}</div>` : ''}
+            </div>
+            <div class="summary">
+              <span class="score ${e.score < 5 ? 'low' : ''}">${e.score}</span>
+              <button class="delete-link" onclick="deleteEntry('${e.date}','${e.who}')">×</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // alert: 3 consecutive days under 5
+    const lowStreak = checkLowStreak(entries);
+    const alertArea = document.getElementById('alert-area');
+    if (lowStreak >= 3) {
+      alertArea.innerHTML = `
+        <div class="alert">
+          <strong style="color:var(--warn);">${currentWho === 'mum' ? 'Mum' : 'Dad'}</strong> has logged ${lowStreak} consecutive days under 5.<br>
+          Past-us said: <em>three days under 5 = act, don't wait.</em><br>
+          Open ${currentWho === 'mum' ? 'Card 3' : 'Card 6'} and start the action ladder.
+        </div>
+      `;
+    } else {
+      alertArea.innerHTML = '';
+    }
+  }
+
+  function checkLowStreak(entries) {
+    // entries already sorted desc; count consecutive recent days under 5
+    let streak = 0;
+    for (const e of entries) {
+      if (e.score < 5) streak++;
+      else break;
+    }
+    return streak;
+  }
+
+  // initial render if landing directly on check-in
+  if (location.hash === '#checkin') show('checkin');
+</script>
+
+</body>
+</html>
